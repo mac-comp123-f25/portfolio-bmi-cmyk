@@ -1,14 +1,13 @@
-""""
-Implementation of the Aristid Lindenmayer-system (L-systems)
+def apply_l_system(l_system_dict: dict):
+    assert isinstance(l_system_dict, dict)
+    assert len(l_system_dict) == 3
+    assert "axiom" in l_system_dict
+    assert "rules" in l_system_dict
+    assert "n" in l_system_dict
 
-@author: Amin G. Alhashim (aalhashi@macalester.edu)
-"""
-
-
-def apply_l_system(axiom: str, rules: dict, n: int):
-    assert type(axiom) is str
-    assert type(rules) is dict
-    assert type(n) is int
+    axiom = l_system_dict["axiom"]
+    rules = l_system_dict["rules"]
+    n = l_system_dict["n"]
 
     s = axiom
     for _ in range(n):
@@ -42,8 +41,12 @@ def apply_rules(s: str, rules: dict):
 
 
 if __name__ == "__main__":
-    axiom = 'A'
-    rules = {('A', 'B'), ('B', 'AB')}
+    l_system_info = {
+        'axiom': 'A',
+        'rules': {'A': 'B', 'B': 'AB'},
+        'n': 0
+    }
 
     for i in range(10):
-        print(apply_l_system(axiom, rules, i))
+        l_system_info['n'] = i
+        print(apply_l_system(l_system_info))
