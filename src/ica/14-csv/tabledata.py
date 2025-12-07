@@ -29,7 +29,6 @@ def lookup_phone(name, direct_table):
     return "No entry: " + name
 
 
-# ACTIVITY: lookup_office
 def lookup_office(name, direct_table):
     """
     Takes in a person's name and the table, and returns two values,
@@ -42,24 +41,17 @@ def lookup_office(name, direct_table):
     return "No entry: " + name, None
 
 
-
-
-# ACTIVITY: lookup_by_date
 def lookup_by_date(month, day, sun_table):
     """
     Takes in a month string, a day (int or string), and the sun table.
     Returns the row that matches the month and day.
     """
-    # Convert day to string to ensure comparison works, as CSV data is read as strings
     day_str = str(day)
     for row in sun_table:
         if row['Month'] == month and row['Day'] == day_str:
             return row
 
-    return None  # Return None if no match is found
-
-
-# ------------------------------
+    return None
 
 
 def collect_by_building(building, table):
@@ -75,7 +67,6 @@ def collect_by_building(building, table):
     return match_list
 
 
-#ACTIVITY: collect_by_letter
 def collect_by_letter(letter, table):
     """
     Takes a capital letter and the directory table, and returns a list
@@ -83,16 +74,12 @@ def collect_by_letter(letter, table):
     """
     match_list = []
     for row in table:
-        # row['Name'][0] gets the first character of the name string
-        if row['Name'][0] == letter:
+        if row['Name'].startswith(letter):
             match_list.append(row)
 
     return match_list
 
 
-# ----------------------------------
-
-#ACTIVITY: select_by_month
 def select_by_month(month, sun_table):
     """
     Takes a month string and the sun table, and returns a list of all
@@ -106,14 +93,10 @@ def select_by_month(month, sun_table):
     return match_list
 
 
-# ---------------------------------
-
 def count_sunsets_before(hour_time, table):
     """
     Takes in the sunTable for the sunrise/sunset data, and counts how many
-    rows have a sunset hour that is before the input hour time, which must
-    be an integer in 24-hour mode so that 1pm is 13, 6pm is 18, etc.
-    It returns the total count.
+    rows have a sunset hour that is before the input hour time.
     """
     count = 0
     for row in table:
@@ -136,41 +119,30 @@ def daylight_hours(rise_hour, rise_min, set_hour, set_min):
     return hour_diff
 
 
-#ACTIVITY: average_daylight_time
 def average_daylight_time(table):
     """
     Computes the average amount of daylight for all days in the given table.
     """
-    if not table:  # handle case where table is empty
+    if not table:
         return 0
 
     total_daylight = 0
     for row in table:
-        # Convert string values from dictionary to integers
         rise_h = int(row['SunRiseHour'])
         rise_m = int(row['SunRiseMin'])
         set_h = int(row['SunSetHour'])
         set_m = int(row['SunSetMin'])
 
-        # Call the helper function to calculate daylight for the current row
         hours = daylight_hours(rise_h, rise_m, set_h, set_m)
         total_daylight += hours
 
-    # Compute the average
     return total_daylight / len(table)
 
-
-# ---------------------------------------
 
 def main():
     print("--- Testing Directory Functions ---")
     print("Phone for 'Fox, Susan':", lookup_phone('Fox, Susan', directory))
-    print("Phone for 'Shoop, Libby':", lookup_phone('Shoop, Libby', directory))
-
-    print("\nOffice for 'Syed, Una':", lookup_office('Syed, Una', directory))
-    building, office = lookup_office('Warner, Elen', directory)
-    print(f"Office for 'Warner, Elen': Building {building}, Office {office}")
-    print("Office for 'John Doe':", lookup_office('John Doe', directory))
+    print("Office for 'Syed, Una':", lookup_office('Syed, Una', directory))
 
     print("\nPeople in Olin-Rice:")
     olri = collect_by_building('Olin-Rice', directory)
@@ -182,29 +154,19 @@ def main():
 
     print("\n\n--- Testing Sunrise/Sunset Functions ---")
     field_names, sun_table = read_csv("DataFiles/sunRiseSet.csv")
-    print("First row of sunrise/sunset data:", sun_table[0])
 
     print("\nData for May 15:")
     may15_data = lookup_by_date('May', 15, sun_table)
     print(may15_data)
-    print("\nData for October 31:")
-    oct31_data = lookup_by_date('October', '31', sun_table)
-    print(oct31_data)
 
     print("\nData for January:")
     january_data = select_by_month('January', sun_table)
     print_table(january_data, field_names, 15)
 
-    print("\nSunset Counts:")
-    print("Sunsets before 6pm (18:00) =", count_sunsets_before(18, sun_table))
-    print("Sunsets before 10pm (22:00) =", count_sunsets_before(22, sun_table))
-
     print("\nAverage Daylight Hours:")
     print(f"Average daylight for the whole year: {average_daylight_time(sun_table):.2f} hours")
     july_data = select_by_month('July', sun_table)
     print(f"Average daylight for July: {average_daylight_time(july_data):.2f} hours")
-    december_data = select_by_month('December', sun_table)
-    print(f"Average daylight for December: {average_daylight_time(december_data):.2f} hours")
 
 
 if __name__ == '__main__':

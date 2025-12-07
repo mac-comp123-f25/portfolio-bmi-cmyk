@@ -1,10 +1,4 @@
-"""
-Contains a simulation of the Petrie Multiplier that is based on classes.
-"""
-
 import random
-import math
-
 
 class Employee:
     """
@@ -13,111 +7,164 @@ class Employee:
     towards the other gender.
     """
 
-    def __init__(self, gender: str, will_comment):
+    def __init__(self, gender, will_comment):
         """
         Takes in the employee's gender and whether they comment, and it
         saves those values to instance variables. It also initializes the
-        variable that holds the comments received by this employee to zero.
+        variable that holds the comments received by this employee.
         """
-        # TODO: Implement this method then remove this line
-        pass
+        self.gender = gender
+        self.will_comment = will_comment
+        self.comments_received = 0
 
     def __str__(self):
         """
         Produces a printable string format for this employee.
+        (Optional modification included to show commenter status)
         """
-        return (self.gender.rjust(5)
-                + ": "
-                + str(self.comments_received)
-                + " sexist comments received")
+        commenter_status = "Commenter" if self.will_comment else "Non-commenter"
+        return (f"{self.gender:<5} ({commenter_status:^13}): "
+                f"{self.comments_received} sexist comments received")
+
+    def set_commenter_status(self, status):
+        """
+        Sets the will_comment attribute to the given boolean status.
+        """
+        self.will_comment = status
+
+    def receive_sexist_comment(self):
+        """
+        Increments the count of comments received by this employee by one.
+        """
+        self.comments_received += 1
+
+    def get_gender(self):
+        """Returns the employee's gender."""
+        return self.gender
+
+    def get_commenter_status(self):
+        """Returns True if the employee is a commenter, False otherwise."""
+        return self.will_comment
+
+    def get_comments_received(self):
+        """Returns the number of comments received by the employee."""
+        return self.comments_received
 
 
-def print_employee_list(lst):
+def print_employee_list(employee_list):
     """
-    Given a list of employees, this method will print the details of each employee
-    by using the print() method
+    Takes in a list of Employee objects and prints each one.
     """
-    # TODO: Implement this function then remove this line
-    pass
+    for employee in employee_list:
+        print(f"  {employee}")
 
 
-def create_employees(total_num):
+def create_employees(num_employees):
     """
-    Takes in the number of employees to make, builds and returns a list that contains
-    that many employees. It ensures that ~80% are men and the rest women.
+    Generates and returns a list of Employee objects with an 80/20
+    male-to-female ratio. All employees are initially non-commenters.
     """
-    # TODO: Implement this function then remove this line
-    pass
+    num_men = int(num_employees * 0.8)
+    num_women = num_employees - num_men
+
+    employees = []
+    for _ in range(num_men):
+        employees.append(Employee("Man", False))
+    for _ in range(num_women):
+        employees.append(Employee("Woman", False))
+    return employees
 
 
-def create_commenters(lst):
+def create_commenters(employee_list):
     """
-    Given a list of employees, make 20% of each gender be sexist employees. This
-    method should not return anything.
+    Modifies the employee list in-place. Each employee has a 20% chance
+    of being set as a commenter.
     """
-    # TODO: Implement this function then remove this line
-    pass
+    for employee in employee_list:
+        if random.random() < 0.2:
+            employee.set_commenter_status(True)
 
 
-def generate_comments(lst):
+def generate_comments(employee_list):
     """
-    Given a list of employees, have each sexist employee give one sexist comment to
-    another employee of the opposite gender, chosen randomly. This method should
-    not return anything
+    Simulates one round of comments. Each commenter makes a sexist remark
+    directed at a randomly chosen employee of a different gender.
     """
-    # TODO: Implement this function then remove this line
-    pass
+    men = [emp for emp in employee_list if emp.get_gender() == "Man"]
+    women = [emp for emp in employee_list if emp.get_gender() == "Woman"]
+
+    # Proceed only if there are members of both genders to target
+    if not men or not women:
+        return
+
+    # Men comment on women
+    for man in men:
+        if man.get_commenter_status():
+            target = random.choice(women)
+            target.receive_sexist_comment()
+
+    # Women comment on men
+    for woman in women:
+        if woman.get_commenter_status():
+            target = random.choice(men)
+            target.receive_sexist_comment()
 
 
-def average_comments(lst):
+def average_comments(employee_list):
     """
-    Returns a tuple that represents the average amount of comments received for men and women
-    respectively. Return statement will be in the form (<avg_for_men>, <avg_for_women>)
+    Calculates the average number of comments received by men and women.
+    Returns a tuple: (average_for_men, average_for_women).
     """
-    # TODO: Implement this function then remove this line
-    pass
+    male_comment_counts = []
+    female_comment_counts = []
+
+    for employee in employee_list:
+        if employee.get_gender() == "Man":
+            male_comment_counts.append(employee.get_comments_received())
+        else:
+            female_comment_counts.append(employee.get_comments_received())
+
+    avg_male = sum(male_comment_counts) / len(male_comment_counts) if male_comment_counts else 0
+    avg_female = sum(female_comment_counts) / len(female_comment_counts) if female_comment_counts else 0
+
+    return avg_male, avg_female
 
 
 def main():
     """
-    Print out information about the average comments
-    received by men and women after a simulation has been run
+    Runs the main simulation.
     """
-    num_employees_to_generate = 100
-    num_comment_rounds = 50
+    num_employees = 100
+    comment_iterations = 50
 
-    employee_list = create_employees(num_employees_to_generate)
-    create_commenters(employee_list)
-    for rounds in range(num_comment_rounds):
-        generate_comments(employee_list)
+    print(f"--- Starting Petrie Multiplier Simulation ---")
+    print(f"Population: {num_employees} (80% Men, 20% Women)")
+    print(f"Commenter Probability: 20%")
+    print(f"Comment Iterations: {comment_iterations}\n")
 
-    (men_avg, women_avg) = average_comments(employee_list)
-    print("  Men received on average ",   men_avg, "sexist comments")
-    print("Women received on average ", women_avg, "sexist comments")
+    # Step 1: Create the employee population
+    employees = create_employees(num_employees)
 
-
-if __name__ == "__main__":
-    "<----- Test code for print_employee_list ----->"
-    lst = [Employee('Man', True),
-           Employee('Man', False),
-           Employee('Woman', True),
-           Employee('Woman', False)]
-    print_employee_list(lst)
-
-    "<----- Test code for create_employees ----->"
-    employees = create_employees(10)
-    print_employee_list(employees)
-
-    "<----- Test code for create_commenters ----->"
+    # Step 2: Assign commenter status
     create_commenters(employees)
+    print("--- Initial Population (with commenters assigned) ---")
     print_employee_list(employees)
+    print("-" * 50)
 
-    "<----- Test code for generate_comments ----->"
-    generate_comments(employees)
+    # Step 3: Run the comment generation
+    for i in range(comment_iterations):
+        generate_comments(employees)
+
+    print("\n--- Final Results After Simulation ---")
     print_employee_list(employees)
+    print("-" * 50)
 
-    "<----- Test code for average_comments ----->"
-    print(average_comments(employees))
+    # Step 4: Calculate and print the averages
+    avg_men, avg_women = average_comments(employees)
+    print("\n--- Average Comments Received ---")
+    print(f"Average for Men:   {avg_men:.2f}")
+    print(f"Average for Women: {avg_women:.2f}")
 
-    "<----- Run the simulation ----->"
-    # main()  # <-- KEEP THIS, Uncomment it after implementing all the functions
+
+if __name__ == '__main__':
+    main()

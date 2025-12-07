@@ -1,56 +1,62 @@
-import math
-import tkinter as tk
 import turtle
+import math
 
 
-def calc_next_size(curr_size: float) -> float:
-    """Takes in the current straight-line length, and computes
-    and returns the length of the isosceles triangle's side. """
-    h_dist = (curr_size / 2)
-    v_dist = h_dist * math.tan(math.radians(45))
-    hypot = math.sqrt(v_dist ** 2 + h_dist ** 2)
-    return hypot
+def calc_next_size(current_size):
+    """
+    Helper function to calculate the size of the next segment in the Levy C Curve.
+    """
+    return current_size / math.sqrt(2.0)
 
 
-def check_draw_levy(size: float, reps: int) -> None:
-    """Tester function for the draw_levy"""
+def draw_levy(turt, size, reps):
+    """
+    Draws a Levy C Curve fractal recursively.
+    """
+    # Base Case: If repetitions are 1, just draw a straight line.
+    if reps == 1:
+        turt.forward(size)
+    else:
+        # Recursive Step: Replace the line with two smaller Levy curves
+        # forming an isosceles right triangle.
 
-    # setup window
-    win = tk.Toplevel()
-    win.title(f"Levy C Fractal {reps}")
-    win_size = size * 7
-    cv = tk.Canvas(win, width=win_size, height=win_size)
-    cv.pack()
-    ts = turtle.TurtleScreen(cv)
-    t = turtle.RawTurtle(ts)
+        # 1. Compute the new size
+        new_size = calc_next_size(size)
 
-    # set up turtle
-    t.left(90)
-    t.up()
-    # t.backward(size * 3)
-    t.down()
+        # 2. Turn left
+        turt.left(45)
+
+        # 3. Recursively draw the first segment
+        draw_levy(turt, new_size, reps - 1)
+
+        # 4. Turn right
+        turt.right(90)
+
+        # 5. Recursively draw the second segment
+        draw_levy(turt, new_size, reps - 1)
+
+        # 6. Turn left to return to the original orientation
+        turt.left(45)
+
+
+def check_draw_levy(size, reps):
+    """
+    Sets up the turtle and screen for drawing the Levy C Curve.
+    """
+    screen = turtle.Screen()
+    t = turtle.Turtle()
     t.speed(0)
-    t.color("green")
+    t.hideturtle()
+    t.penup()
+    t.goto(-size / 2, 0)
+    t.pendown()
 
-    # draw the draw_tree
     draw_levy(t, size, reps)
 
-
-# TODO: Complete the function
-def draw_levy(turt, size, reps):
-    ...
+    screen.exitonclick()
 
 
-if __name__ == '__main__':
-    root = tk.Tk()
-    root.withdraw()
-
-    # write tests below
-    check_draw_levy(100, 1)
-    check_draw_levy(100, 2)
-    check_draw_levy(100, 3)
-    check_draw_levy(100, 4)
-    check_draw_levy(100, 5)
-    check_draw_levy(100, 10)
-
-    root.mainloop()
+# --- Test Call ---
+if __name__ == "__main__":
+    # This will draw the fractal for 10 repetitions.
+    check_draw_levy(300, 10)
