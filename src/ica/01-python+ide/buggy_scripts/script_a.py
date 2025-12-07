@@ -3,6 +3,6 @@
 a = 5
 b = 10
 c = 20
-b = 0
+b = 40
 d = a / b
 print(d)
